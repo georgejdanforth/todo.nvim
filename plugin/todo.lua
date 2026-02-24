@@ -6,13 +6,18 @@ local todo = require("todo")
 
 local state = {
     path = nil,
-    tasks = {}
+    tasks = {},
+    biggest_id = nil
 }
 
 -- Detect if file is already initialized in this directory
 if vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), 'todo.txt')) == 1 then
-    state.path = vim.fs.joinpath(vim.fn.getcwd(), 'todo.txt')
-    state.tasks = todo.parse(state.path)
+    state.path              = vim.fs.joinpath(vim.fn.getcwd(), 'todo.txt')
+    local tasks, biggest_id = todo.parse(state.path)
+    state.tasks             = tasks
+    state.biggest_id        = biggest_id
+
+    vim.print(state)
 end
 
 vim.api.nvim_create_user_command("Todo", function(opts)
@@ -26,6 +31,9 @@ vim.api.nvim_create_user_command("Todo", function(opts)
         if state == nil then
             state.path = result
         end
+    elseif opts.fargs[1] == "add" then
+        todo.add(state.tasks, "test item")
+        todo.serialize(state.tasks, state.path)
     end
 end, { nargs = "+" })
 

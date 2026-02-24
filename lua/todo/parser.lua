@@ -15,13 +15,17 @@ local Task = function(id, name, description, status)
     }
 end
 
-function M.parse_task_block(status, contents)
-    local tasks = {}
+function M.parse_task_block(status, contents, tasks)
+    local biggest_id = 0
     for line in string.gmatch(contents, "([^\r\n]+)") do
-        local id, name = string.match(line, "^%- %[(T%d+)%] ([^\r\n]+)")
-        tasks[id] = Task(id, name, "", status)
+        local id, name = string.match(line, "^%- %[T(%d+)%] ([^\r\n]+)")
+        id = tonumber(id)
+        if id > biggest_id then
+            biggest_id = id
+        end
+        table.insert(tasks, Task(id, name, "", status))
     end
-    return tasks
+    return biggest_id
 end
 
 function M.parse(contents)
@@ -30,19 +34,16 @@ function M.parse(contents)
     if not todo_start then
         error({ message = "TODO section not found" })
     end
-    vim.print(todo_start, todo_end)
 
     local in_progress_start, in_progress_end = string.find(contents, "IN%-PROGRESS:\n")
     if not in_progress_start then
         error({ message = "IN-PROGRESS section not found" })
     end
-    vim.print(in_progress_start, in_progress_end)
 
     local done_start, done_end = string.find(contents, "DONE:")
     if not done_start then
         error({ message = "DONE section not found" })
     end
-    vim.print(done_start, done_end)
 
     local file_end = #contents
 
@@ -50,24 +51,14 @@ function M.parse(contents)
     local in_progress_section = string.sub(contents, in_progress_end + 1, done_start - 1)
     local done_section = string.sub(contents, done_end + 1, file_end - 1)
 
-    local todo_tasks = M.parse_task_block(Status.TODO, todo_section)
-    local in_progress_tasks = M.parse_task_block(Status.IN_PROGRESS, in_progress_section)
-    local done_tasks = M.parse_task_block(Status.DONE, done_section)
-
     local tasks = {}
-    tasks = vim.tbl_deep_extend("force", tasks, todo_tasks)
-    tasks = vim.tbl_deep_extend("force", tasks, in_progress_tasks)
-    tasks = vim.tbl_deep_extend("force", tasks, done_tasks)
+    local biggest_id = math.max(
+        M.parse_task_block(Status.TODO, todo_section, tasks),
+        M.parse_task_block(Status.IN_PROGRESS, in_progress_section, tasks),
+        M.parse_task_block(Status.DONE, done_section, tasks)
+    )
 
-    vim.print(tasks)
-
-    -- vim.print({
-    --     todo_section = todo_section,
-    --     in_progress_section = in_progress_section,
-    --     done_section = done_section
-    -- })
-
-    return tasks
+    return tasks, biggest_id
 end
 
 return M

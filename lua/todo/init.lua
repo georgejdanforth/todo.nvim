@@ -53,8 +53,15 @@ end
 -- Populate state variable with todos
 function M.parse(path)
     local contents = M.read_todo_file(path)
-    local tasks = parser.parse(contents)
-    return tasks
+    local tasks, biggest_id = parser.parse(contents)
+    return tasks, biggest_id
+end
+
+function M.add(tasks, name)
+end
+
+function M.serialize(tasks, path)
+    return
 end
 
 return M
