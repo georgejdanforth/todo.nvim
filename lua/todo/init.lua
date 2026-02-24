@@ -1,3 +1,4 @@
+local parser = require('todo/parser')
 local M = {}
 
 local Status = {
@@ -55,23 +56,19 @@ function M.init(dir)
     return path
 end
 
-function M.read_todo_file()
-    local path = M.get_init_path()
-    assert.equals(1, vim.fn.filereadable(path))
+function M.read_todo_file(path)
     local file = io.open(path, "r")
     local content = file:read("*a")
     file:close()
-    assert.equals(todo.todo_template, content)
+    return content
 end
 
 -- Take the current directory's todo file and return ast
 -- Populate state variable with todos
-function M.parse()
-    return {
-        tasks = {
-            Task(1, "test", "test description", Status.IN_PROGRESS),
-        }
-    }
+function M.parse(path)
+    local contents = M.read_todo_file(path)
+    local tasks = parser.parse(contents)
+    return tasks
 end
 
 return M

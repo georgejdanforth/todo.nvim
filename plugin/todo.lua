@@ -13,8 +13,6 @@ local state = {
 if vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), 'todo.txt')) == 1 then
     state.path = vim.fs.joinpath(vim.fn.getcwd(), 'todo.txt')
     state.tasks = todo.parse(state.path)
-    print(state)
-    vim.print(state)
 end
 
 vim.api.nvim_create_user_command("Todo", function(opts)
