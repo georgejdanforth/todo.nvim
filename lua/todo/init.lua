@@ -1,20 +1,6 @@
 local parser = require('todo/parser')
 local M = {}
 
-local Status = {
-    TODO = "TODO",
-    DONE = "DONE",
-    IN_PROGRESS = "IN-PROGRESS"
-}
-
-local Task = function(id, name, description, status)
-    return {
-        id = id,
-        name = name,
-        description = description,
-        status = status,
-    }
-end
 
 M.config = {
     -- default config options go here
