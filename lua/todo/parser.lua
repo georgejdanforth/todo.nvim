@@ -6,7 +6,7 @@ local Status = {
     IN_PROGRESS = "IN-PROGRESS"
 }
 
-local Task = function(id, name, description, status)
+M.Task = function(id, name, description, status)
     return {
         id = id,
         name = name,
@@ -23,7 +23,7 @@ function M.parse_task_block(status, contents, tasks)
         if id > biggest_id then
             biggest_id = id
         end
-        table.insert(tasks, Task(id, name, "", status))
+        table.insert(tasks, M.Task(id, name, "", status))
     end
     return biggest_id
 end

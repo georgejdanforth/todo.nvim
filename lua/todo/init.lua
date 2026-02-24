@@ -57,11 +57,39 @@ function M.parse(path)
     return tasks, biggest_id
 end
 
-function M.add(tasks, name)
+function M.add(tasks, id, name)
+    table.insert(tasks, parser.Task(id, name, "", "TODO"))
 end
 
 function M.serialize(tasks, path)
-    return
+    local todo_tasks = {}
+    local i_tasks = {}
+    local d_tasks = {}
+    for i, v in ipairs(tasks) do
+        if v.status == "TODO" then
+            table.insert(todo_tasks, v)
+        elseif v.status == "IN-PROGRESS" then
+            table.insert(i_tasks, v)
+        elseif v.status == "DONE" then
+            table.insert(d_tasks, v)
+        end
+    end
+
+    local final = ""
+    final = final .. string.format("TODO:\n")
+    for i, v in ipairs(todo_tasks) do
+        final = final .. string.format("- [T%d] %s\n", v.id, v.name)
+    end
+    final = final .. string.format("\nIN-PROGRESS:\n")
+    for i, v in ipairs(i_tasks) do
+        final = final .. string.format("- [T%d] %s\n", v.id, v.name)
+    end
+    final = final .. string.format("\nDONE:\n")
+    for i, v in ipairs(d_tasks) do
+        final = final .. string.format("- [T%d] %s\n", v.id, v.name)
+    end
+
+    return final
 end
 
 return M
