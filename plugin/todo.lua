@@ -10,9 +10,9 @@ local state = {
 }
 
 -- Detect if file is already initialized in this directory
-if vim.fs.filereadable(vim.fs.joinpath(vim.fn.cwd(), 'todo.txt')) == 1 then
-    state.path = vim.fs.joinpath(vim.fn.cwd(), 'todo.txt')
-    state.tasks = M.parse(state.path)
+if vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), 'todo.txt')) == 1 then
+    state.path = vim.fs.joinpath(vim.fn.getcwd(), 'todo.txt')
+    state.tasks = todo.parse(state.path)
     print(state)
     vim.print(state)
 end
