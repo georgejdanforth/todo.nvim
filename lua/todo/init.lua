@@ -9,15 +9,15 @@ function M.setup(opts)
 end
 
 -- Template for the TODO list file
-local todo_template = [[TODO:
+M.todo_template = [[TODO:
 
 IN-PROGRESS:
 
 DONE:]]
 
-function get_init_path(path)
+function M.get_init_path(path)
   if path == nil then
-    return vim.fn.getcwd() .. "todo.txt"
+    return vim.fs.joinpath(vim.fn.getcwd(), "todo.txt")
   else
     if vim.fn.isdirectory(path) == 1 then
       return vim.fs.joinpath(path, "todo.txt")
@@ -27,13 +27,16 @@ function get_init_path(path)
   end
 end
 
-function M.init()
-  local path, err = pcall(get_init_path())
-  if err then
-    print(err)
-    return
+function M.init(dir)
+  local path = M.get_init_path(dir)
+  if vim.fn.filereadable(path) == 0 then
+    local file, err = io.open(path, "w")
+    if not file then
+      error({ message = err })
+    end
+    file:write(M.todo_template)
+    file:close()
   end
-
 end
 
 return M
